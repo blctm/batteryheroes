@@ -27,7 +27,7 @@ st.markdown(
 # Title
 st.title("Battery Heroes & GIGAGREEN - Kick-Off Meeting Poll")
 st.write("st.write("Help us find the best time and focus for our upcoming meeting! We are initially planning for a 90-minute session, so please consider this when selecting your preferred time slots.")
-")
+
 
 # Step 1: Preferred Month
 st.header("1️⃣ When would you prefer the meeting to take place?")
