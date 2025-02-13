@@ -4,10 +4,10 @@ import gspread
 from google.oauth2.service_account import Credentials
 import json
 
-# Load credentials from Streamlit secrets
-gcp_credentials = st.secrets["gcp_service_account"]
-# Convert secrets into a dictionary
-credentials_dict = dict(gcp_credentials)
+# Load credentials properly
+gcp_credentials = json.loads(st.secrets["gcp_service_account"])
+creds = Credentials.from_service_account_info(gcp_credentials)
+client = gspread.authorize(creds)
 
 # Fix private key formatting
 credentials_dict["private_key"] = credentials_dict["private_key"].replace("\\n", "\n")
