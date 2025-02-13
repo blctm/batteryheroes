@@ -1,5 +1,16 @@
 import streamlit as st
 import pandas as pd
+import gspread
+from google.oauth2.service_account import Credentials
+import json
+
+# Load credentials from Streamlit secrets
+gcp_credentials = st.secrets["gcp_service_account"]
+creds = Credentials.from_service_account_info(dict(gcp_credentials))
+client = gspread.authorize(creds)
+
+# Open the Google Sheet
+sheet = client.open_by_key("YOUR_SHEET_ID").sheet1
 
 # Set background color
 st.markdown(
