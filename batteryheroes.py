@@ -6,7 +6,14 @@ import json
 
 # Load credentials from Streamlit secrets
 gcp_credentials = st.secrets["gcp_service_account"]
-creds = Credentials.from_service_account_info(dict(gcp_credentials))
+# Convert secrets into a dictionary
+credentials_dict = dict(gcp_credentials)
+
+# Fix private key formatting
+credentials_dict["private_key"] = credentials_dict["private_key"].replace("\\n", "\n")
+
+# Authenticate with Google Sheets
+creds = Credentials.from_service_account_info(credentials_dict)
 client = gspread.authorize(creds)
 
 # Open the Google Sheet
