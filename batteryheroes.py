@@ -4,6 +4,10 @@ import gspread
 from google.oauth2.service_account import Credentials
 import json
 
+
+# Print all keys inside the secrets
+st.write("Secrets Keys:", list(st.secrets["gcp_service_account"].keys()))
+
 # Load credentials from Streamlit secrets
 gcp_credentials = st.secrets["gcp_service_account"]
 # Convert secrets into a dictionary
