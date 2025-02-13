@@ -10,7 +10,7 @@ creds = Credentials.from_service_account_info(dict(gcp_credentials))
 client = gspread.authorize(creds)
 
 # Open the Google Sheet
-sheet = client.open_by_key("YOUR_SHEET_ID").sheet1
+sheet = client.open_by_key("1umTQpFIQCrNU7NBjPRaxx7O4Zzo7jcFctF1111_M04M").sheet1
 
 # Set background color
 st.markdown(
