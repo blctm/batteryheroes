@@ -1,46 +1,7 @@
 import streamlit as st
 import pandas as pd
-import gspread
-from google.oauth2.service_account import Credentials
-import json
-
-# Load credentials properly
-gcp_credentials = json.loads(st.secrets["gcp_service_account"])
-creds = Credentials.from_service_account_info(gcp_credentials)
-client = gspread.authorize(creds)
-
-# Fix private key formatting
-credentials_dict["private_key"] = credentials_dict["private_key"].replace("\\n", "\n")
-
-# Authenticate with Google Sheets
-creds = Credentials.from_service_account_info(credentials_dict)
-client = gspread.authorize(creds)
-
-# Open the Google Sheet
-sheet = client.open_by_key("1umTQpFIQCrNU7NBjPRaxx7O4Zzo7jcFctF1111_M04M").sheet1
-
-# Set background color
-st.markdown(
-    """
-    <style>
-    .stApp {
-        background-color: #e0f2e9;
-    }
-    h1, h2 {
-        color: #1b5e20; /* Dark Green */
-    }
-    .stNumberInput label, .stTextInput label, .stSelectbox label {
-        color: #1b5e20; /* Dark Green */
-    }
-    .stButton>button {
-        background-color: #1b5e20; /* Dark Green */
-        color: white;
-    }
-       
-    </style>
-    """,
-    unsafe_allow_html=True
-)
+import smtplib
+from email.message import EmailMessage
 
 # Title
 st.title("Battery Heroes & GIGAGREEN - Kick-Off Meeting Poll")
@@ -92,18 +53,44 @@ project = st.selectbox(
 )
 email = st.text_input("Your Email")
 
-# Save responses
+# Function to send email
+def send_email(csv_filename):
+    sender_email = "your_email@gmail.com"  # Your email
+    receiver_email = "your_email@gmail.com"  # Where responses go
+    password = "your_app_password"  # Use an **App Password**, not your real password!
+
+    msg = EmailMessage()
+    msg["Subject"] = "New Battery Heroes Meeting Response"
+    msg["From"] = sender_email
+    msg["To"] = receiver_email
+    msg.set_content(f"A new response has been submitted. See the attached CSV.")
+
+    # Attach CSV
+    with open(csv_filename, "rb") as f:
+        msg.add_attachment(f.read(), maintype="text", subtype="csv", filename=csv_filename)
+
+    # Send email
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+            server.login(sender_email, password)
+            server.send_message(msg)
+        st.success("✅ Response submitted & emailed successfully!")
+    except Exception as e:
+        st.error(f"❌ Failed to send email: {e}")
+
+# Save responses & send email
 if st.button("Submit Your Response"):
     responses = {
-        "Name": name,
-        "Project": project,
-        "Email": email,
-        "Preferred Months": months,
-        "Preferred Days": days,
-        "Preferred Time Slots": time_slots,
-        "Meeting Goals": goals,
+        "Name": name, "Project": project, "Email": email,
+        "Preferred Months": ", ".join(months), "Preferred Days": ", ".join(days),
+        "Preferred Time Slots": ", ".join(time_slots), "Meeting Goals": ", ".join(goals),
         "Other Goal": other_goal
     }
     df = pd.DataFrame([responses])
-    df.to_csv("meeting_poll_responses.csv", mode='a', header=False, index=False)
-    st.success("Thank you! Your response has been recorded.")
+
+    # Save CSV
+    csv_filename = "meeting_poll_responses.csv"
+    df.to_csv(csv_filename, mode='a', header=False, index=False)
+
+    # Send email with CSV
+    send_email(csv_filename)
